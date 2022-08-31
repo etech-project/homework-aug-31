@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.region
+}
+
 locals {
   ec2_instance = [{
     ami  = "ami-08d4ac5b634553e16"
@@ -18,10 +22,6 @@ locals {
   ]
 }
 
-provider "aws" {
-  region = var.region
-}
-
 resource "aws_instance" "instance" {
   for_each = {
     for index, i in local.ec2_instance :
@@ -37,3 +37,21 @@ resource "aws_instance" "instance" {
   key_name        = var.key_name
   security_groups = var.security_groups
 }
+
+resource "aws_s3_bucket" "b" {
+  bucket = var.bucket
+
+
+  tags = {
+    Name = "bucket-${var.bucket}"
+  }
+}
+
+# uncomment  and run terraform init to move to remote backend
+# terraform {
+#   backend "s3" {
+#     bucket = "s3-bucket-unique-b"
+#     key    = "s3/terraform.tfstate"
+#     region = "us-east-1"
+#   }
+# }
